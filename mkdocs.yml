@@ -1,0 +1,9 @@
+site_name: ML Platform
+
+nav:
+    - Home: index.md
+    - API: api.md
+    - Developers: developers.md
+    - About: about.md
+
+theme: readthedocs

@@ -1,0 +1,64 @@
+version: '3'
+services:
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pimlplatform.azurecr.io/ml-platform-api:latest
+    container_name: ml-api
+    ports:
+      - "8000:8000"
+    restart: always
+    environment:
+      SECRET_KEY: "${SECRET_KEY}"
+      ALGORITHM: "${ALGORITHM}"
+
+      STORAGE_CONNSTR: "${STORAGE_CONNSTR}"
+      FEEDBACK_CONTAINER: "${FEEDBACK_CONTAINER}"
+
+      MONGO_SERVER: "${MONGO_SERVER}"
+      DATABASE_NAME: "${DATABASE_NAME}"
+      MONGO_USER: "${MONGO_USER}"
+      MONGO_PWD: "${MONGO_PWD}"
+
+      WORKERS_PER_CORE: 4
+      MAX_WORKERS: 16
+      BIND: "0.0.0.0:8000"
+#    volumes:
+#      - appdata:/var/www
+    depends_on:
+      - mongodb
+    networks:
+#      - frontend
+      - backend
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    command: mongod --auth
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${MONGO_ROOT_USER}"
+      MONGO_INITDB_ROOT_PASSWORD: "${MONGO_ROOT_PWD}"
+      MONGO_INITDB_DATABASE: "${DATABASE_NAME}"
+      MONGODB_DATA_DIR: /data/db
+      MONDODB_LOG_DIR: /dev/null
+#    volumes:
+#      - mongodbdata:/data/db
+    networks:
+      - backend
+
+networks:
+#  frontend:
+#    driver: bridge
+  backend:
+    driver: bridge
+
+#volumes:
+#  mongodbdata:
+#    driver: local
+#  appdata:
+#    driver: local
+#  nginxdata:
+#    driver: local
